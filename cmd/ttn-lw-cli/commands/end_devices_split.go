@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/gogo/protobuf/types"
+	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -338,4 +339,47 @@ func deleteEndDevice(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers) err
 	}
 
 	return nil
+}
+
+func updateDeviceLocation(device *ttnpb.EndDevice, flags *pflag.FlagSet) bool {
+	latitude, _ := flags.GetFloat64("location.latitude")
+	longitude, _ := flags.GetFloat64("location.longitude")
+	altitude, _ := flags.GetInt32("location.altitude")
+	accuracy, _ := flags.GetInt32("location.accuracy")
+
+	if latitude == 0 && longitude == 0 && altitude == 0 && accuracy == 0 {
+		return false
+	}
+	// need both latitude and longitude
+	if latitude == 0 {
+		logger.Warn("--location.latitude is required")
+		return false
+	}
+	if longitude == 0 {
+		logger.Warn("--location.longitude is required")
+		return false
+	}
+
+	if device.Locations == nil {
+		device.Locations = make(map[string]*ttnpb.Location)
+	}
+	loc, ok := device.Locations["user"]
+	if !ok {
+		loc = &ttnpb.Location{}
+	}
+	loc.Source = ttnpb.SOURCE_REGISTRY
+	if altitude != 0 {
+		loc.Altitude = altitude
+	}
+	if longitude != 0 {
+		loc.Longitude = longitude
+	}
+	if latitude != 0 {
+		loc.Latitude = latitude
+	}
+	if accuracy != 0 {
+		loc.Accuracy = accuracy
+	}
+	device.Locations["user"] = loc
+	return true
 }

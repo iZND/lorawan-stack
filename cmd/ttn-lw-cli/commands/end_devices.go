@@ -45,6 +45,7 @@ var (
 	setEndDeviceFlags        = &pflag.FlagSet{}
 	endDeviceFlattenPaths    = []string{"provisioning_data"}
 	endDevicePictureFlags    = &pflag.FlagSet{}
+	endDeviceLocationFlags   = &pflag.FlagSet{}
 
 	selectAllEndDeviceFlags = util.SelectAllFlagSet("end devices")
 )
@@ -473,6 +474,9 @@ var (
 				}
 				paths = append(paths, "claim_authentication_code")
 			}
+			if updateDeviceLocation(&device, cmd.Flags()) {
+				paths = append(paths, "locations")
+			}
 
 			if err = util.SetFields(&device, setEndDeviceFlags); err != nil {
 				return err
@@ -556,6 +560,11 @@ var (
 			rawUnsetPaths, _ := cmd.Flags().GetStringSlice("unset")
 			unsetPaths := util.NormalizePaths(rawUnsetPaths)
 
+			var device ttnpb.EndDevice
+			if updateDeviceLocation(&device, cmd.Flags()) {
+				paths = append(paths, "locations")
+			}
+
 			if len(paths)+len(unsetPaths) == 0 {
 				logger.Warn("No fields selected, won't update anything")
 				return nil
@@ -564,7 +573,6 @@ var (
 				overlapPaths := ttnpb.ExcludeFields(paths, remainingPaths...)
 				return errConflictingPaths.WithAttributes("field_mask_paths", overlapPaths)
 			}
-			var device ttnpb.EndDevice
 			if ttnpb.HasAnyField(paths, setEndDeviceToJS...) || ttnpb.HasAnyField(unsetPaths, setEndDeviceToJS...) {
 				device.SupportsJoin = true
 			}
@@ -1123,6 +1131,11 @@ func init() {
 
 	endDevicePictureFlags.String("picture", "", "upload the end device picture from this file")
 
+	endDeviceLocationFlags.Float64("location.longitude", 0, "device location longitude")
+	endDeviceLocationFlags.Float64("location.latitude", 0, "device location latitude")
+	endDeviceLocationFlags.Int32("location.altitude", 0, "device location altitude")
+	endDeviceLocationFlags.Int32("location.accuracy", 0, "device location accuracy")
+
 	endDevicesListFrequencyPlans.Flags().Uint32("base-frequency", 0, "base frequency in MHz for hardware support (433, 470, 868 or 915)")
 	endDevicesCommand.AddCommand(endDevicesListFrequencyPlans)
 	endDevicesListCommand.Flags().AddFlagSet(applicationIDFlags())
@@ -1149,12 +1162,14 @@ func init() {
 	endDevicesCreateCommand.Flags().Bool("with-session", false, "generate ABP session DevAddr and keys")
 	endDevicesCreateCommand.Flags().Bool("with-claim-authentication-code", false, "generate claim authentication code of 4 bytes")
 	endDevicesCreateCommand.Flags().AddFlagSet(endDevicePictureFlags)
+	endDevicesCreateCommand.Flags().AddFlagSet(endDeviceLocationFlags)
 	endDevicesCommand.AddCommand(endDevicesCreateCommand)
 	endDevicesUpdateCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	endDevicesUpdateCommand.Flags().AddFlagSet(setEndDeviceFlags)
 	endDevicesUpdateCommand.Flags().AddFlagSet(attributesFlags())
 	endDevicesUpdateCommand.Flags().Bool("touch", false, "set in all registries even if no fields are specified")
 	endDevicesUpdateCommand.Flags().AddFlagSet(endDevicePictureFlags)
+	endDevicesUpdateCommand.Flags().AddFlagSet(endDeviceLocationFlags)
 	endDevicesUpdateCommand.Flags().AddFlagSet(util.UnsetFlagSet())
 	endDevicesCommand.AddCommand(endDevicesUpdateCommand)
 	endDevicesProvisionCommand.Flags().AddFlagSet(applicationIDFlags())

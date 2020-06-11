@@ -23,25 +23,27 @@
   var prev = null;
   for (var i = 0; i < radios.length; i++) {
       radios[i].addEventListener('change', function() {
+
           if (this !== prev) {
               prev = this;
           }
-
-          var metadata = {
-            href: window.location.href,
-          };
 
           const feedback = this.value === '1' ? 'thumbs-down' : 'thumbs-up'
 
           {{ if .Site.Params.analytics.enabled }}
           gtag('event', feedback, {
-            'event_category' : 'feedback',
-            'event_label' : feedback,
-            'value': metadata,
+            'event_category' : feedback,
+            'event_label' : window.location.href,
+            'value': this.value,
           });
           {{ end }}
 
           {{ if .Site.Params.feedback.enabled }}
+
+          var metadata = {
+            href: window.location.href,
+          };
+
           Intercom('trackEvent', feedback, metadata);
 
           if(feedback === 'thumbs-down'){

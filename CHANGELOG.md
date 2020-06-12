@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Packet Broker Agent cluster ID is used as subscription group.
 - LinkADR handling in 72-channel bands.
+- Logout operation not working properly in the Console in some rare situations.
 
 ## [3.8.3] - 2020-06-05
 

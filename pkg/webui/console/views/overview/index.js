@@ -238,6 +238,7 @@ export default class Overview extends React.Component {
                 className={style.welcome}
                 content={hasEntities ? m.welcomeBack : m.welcome}
                 values={{ userId }}
+                data-test="overview__welcome_text"
                 component="h1"
               />
               {!mayNotViewEntities && (

@@ -69,7 +69,11 @@ const Header = function({
         {!isGuest && (
           <div className={style.right}>
             {searchable && <Input icon="search" onEnter={onSearchRequest} />}
-            <ProfileDropdown className={style.profileDropdown} userId={user.ids.user_id}>
+            <ProfileDropdown
+              className={style.profileDropdown}
+              userId={user.ids.user_id}
+              data-test="header__profile_dropdown"
+            >
               {dropdownItems}
             </ProfileDropdown>
             <button onClick={handleMobileMenuClick} className={style.mobileMenu}>

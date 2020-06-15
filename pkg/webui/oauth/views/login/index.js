@@ -140,14 +140,16 @@ export default class OAuth extends React.PureComponent {
               <Form.Field
                 title={sharedMessages.userId}
                 name="user_id"
+                data-test="login__form__user_name"
                 component={Input}
                 autoFocus
                 required
               />
               <Form.Field
                 title={sharedMessages.password}
-                component={Input}
                 name="password"
+                data-test="login__form__password"
+                component={Input}
                 type="password"
                 required
               />

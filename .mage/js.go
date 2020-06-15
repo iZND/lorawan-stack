@@ -185,6 +185,26 @@ func (js Js) BuildMain() error {
 	return webpack("--config", "config/webpack.config.babel.js")
 }
 
+// BuildIfNecessary builds the frontend bundles but only if source files have
+// been modified.
+func (js Js) BuildIfNecessary() error {
+	changed, err := target.Dir("./public", "./pkg/webui", "./config/webpack.config.babel.js", "./config/webpack.dll.babel.js", "./sdk/js", "./yarn.lock", "./package.json")
+	if err != nil {
+		return err
+	}
+	if changed {
+		if mg.Verbose() {
+			fmt.Println("Building frontend files due to changes in source files...")
+		}
+		mg.Deps(js.Build)
+	} else {
+		if mg.Verbose() {
+			fmt.Println("Skipping frontend build due to no source file changes being detected...")
+		}
+	}
+	return nil
+}
+
 // BuildDll runs the webpack command to build the DLL bundle
 func (js Js) BuildDll() error {
 	mg.Deps(js.Deps)

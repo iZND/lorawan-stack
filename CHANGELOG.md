@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Organization API key deletion in the Console.
+
 ## [3.8.4] - 2020-06-12
 
 ### Added

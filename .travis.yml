@@ -22,6 +22,7 @@ env:
 matrix:
   include:
     - env: RUNTYPE=js
+    - env: RUNTYPE=end-to-end
     - env: RUNTYPE=go.test RUN_GOARCH=amd64
     - env: RUNTYPE=go.test RUN_GOARCH=386
     - env: RUNTYPE=go.lint
@@ -77,6 +78,10 @@ install:
       $MAGE docs:deps
     fi
   - |
+    if [[ "$RUNTYPE" == "end-to-end" ]]; then
+      $MAGE js:devDeps js:deps jsSDK:deps
+    fi
+  - |
     if [[ "$RUNTYPE" == "release" ]]; then
       set -e
       sudo apt-get -y update
@@ -102,6 +107,10 @@ script:
   - if [[ "$RUNTYPE" == "js" ]]; then $MAGE js:lint jsSDK:lint; fi
   - if [[ "$RUNTYPE" == "js" ]]; then $MAGE version:files; fi
   - if [[ "$RUNTYPE" == "js" ]]; then $MAGE docs:build; fi
+  - if [[ "$RUNTYPE" == "end-to-end"]]; then $MAGE endToEnd:prepare; fi
+  - if [[ "$RUNTYPE" == "end-to-end"]]; then $MAGE endToEnd:runTestStack &; fi
+  - if [[ "$RUNTYPE" == "end-to-end"]]; then $MAGE endToEnd:waitUntilReady; fi
+  - if [[ "$RUNTYPE" == "end-to-end"]]; then $MAGE endToEnd:run; fi
   - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE headers:check; fi
   - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE proto:goClean proto:go; fi
   - if [[ "$RUNTYPE" == "go.lint" ]]; then $MAGE go:messages; fi

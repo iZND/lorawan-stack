@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Handling API key deletion event for applications, gateways, organizations and users.
+
 ## [3.8.4] - 2020-06-12
 
 ### Added

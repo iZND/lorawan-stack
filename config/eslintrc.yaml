@@ -3,6 +3,7 @@ extends:
   - plugin:jest/recommended
   - plugin:jsdoc/recommended
   - plugin:import/recommended
+  - plugin:cypress/recommended
   - prettier
   - prettier/react
 
@@ -12,6 +13,7 @@ plugins:
   - jsdoc
   - prettier
   - import
+  - cypress
 
 settings:
   import/ignore:
